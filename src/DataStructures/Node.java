@@ -10,14 +10,14 @@ public class Node<T> {
     public boolean isStart = false;
     public boolean isEnd = false;
 
-    public Node(Node<T> next, T value) {
+    public Node(Node<T> next, T value, GUI.Frame frame) {
         this.value = value;
         this.next = next;
 
         if (value instanceof Point) {
             Point p = (Point) value;
             // System.out.println("Node: s " + Frame.getSPoint());
-            if (p.x == Frame.getSPoint().x && p.y == Frame.getSPoint().y) {
+            if (p.x == frame.getSPoint().x && p.y == frame.getSPoint().y) {
                 isStart = true;
             }
         }
@@ -25,7 +25,7 @@ public class Node<T> {
         if (value instanceof Point) {
             Point p = (Point) value;
             // System.out.println("Node: e " + Frame.getEPoint());
-            if (p.x == Frame.getEPoint().x && p.y == Frame.getEPoint().y) {
+            if (p.x == frame.getEPoint().x && p.y == frame.getEPoint().y) {
                 isEnd = true;
             }
         }

@@ -10,16 +10,18 @@ import java.awt.*;
 public class MazeGenerator {
     //recursively create maze
 
+    private final GUI.Frame frame;
     Point sPoint, ePoint;
     private final ArrayList<ArrayList<Boolean>> visited = new ArrayList<>();
     ArrayList<ArrayList<Node<Point>>> grid;
     ArrayList<Point> walls = new ArrayList<>();
     // Random rand = new Random();
 
-    public MazeGenerator(Point sPoint, Point ePoint, ArrayList<ArrayList<Node<Point>>> grid) {
+    public MazeGenerator(Point sPoint, Point ePoint, ArrayList<ArrayList<Node<Point>>> grid, GUI.Frame frame) {
         this.sPoint = sPoint;
         this.ePoint = ePoint;
         this.grid = grid;
+        this.frame = frame;
     }
 
     public ArrayList<Point> recursiveDivision() {
@@ -29,7 +31,7 @@ public class MazeGenerator {
 
         //@Error - still doesn't work completely but its better
         //       - height and width are sometimes just 1 short
-        Section[] curr = divide(walls, new Dimension(Frame.width/20, Frame.height/20), new Point(0, 0));
+        Section[] curr = divide(walls, new Dimension(frame.getWidth()/20, frame.getHeight()/20), new Point(0, 0));
 
         // Section[] two = divide(walls, curr[0].dimension, curr[0].startPoint);
 
@@ -147,8 +149,8 @@ public class MazeGenerator {
 
     ArrayList<Point> setAllWalls() {
         ArrayList<Point> walls = new ArrayList<>();
-        for (int y = 0; y < Frame.height/20; y++) {
-            for (int x = 0; x < Frame.width/20; x++) {
+        for (int y = 0; y < frame.getHeight()/20; y++) {
+            for (int x = 0; x < frame.getWidth()/20; x++) {
                 if (!Helper.pEqualsP(new Point(x, y), sPoint) && !Helper.pEqualsP(new Point(x, y), ePoint)) { 
                     walls.add(new Point(x, y));
                 }
@@ -159,9 +161,9 @@ public class MazeGenerator {
     }
 
     private void setVisited() {
-        for (int i = 0; i < Frame.height/20; i++) {
+        for (int i = 0; i < frame.getHeight()/20; i++) {
             ArrayList<Boolean> row = new ArrayList<>();
-            for (int j = 0; j < Frame.width/20; j++) {
+            for (int j = 0; j < frame.getWidth()/20; j++) {
                 row.add(false);
             }
             visited.add(row);

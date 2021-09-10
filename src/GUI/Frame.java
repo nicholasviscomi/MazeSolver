@@ -26,19 +26,19 @@ eventually try and carry that creation over to this project
 @SuppressWarnings("ALL")
 public class Frame extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
     private static final long serialVersionUID = 1L;
-    public static int width = 1200;
-    public static int height = 600;
+    public int width = 1200;
+    public int height = 600;
     static int gridSide = 20;
-    public static Point sPoint;
-    public static Point ePoint;
+    public Point sPoint;
+    public Point ePoint;
 
     static JFrame frame;
     // private JPanel panel;
 
-    public static ArrayList<Point> walls = new ArrayList<>();
-    public static ArrayList<ArrayList<Node<Point>>> grid = new ArrayList<>();
-    public static ArrayList<Node<Point>> path = new ArrayList<>();
-    public static ArrayList<Point> openNodes = new ArrayList<>();
+    public ArrayList<Point> walls = new ArrayList<>();
+    public ArrayList<ArrayList<Node<Point>>> grid = new ArrayList<>();
+    public ArrayList<Node<Point>> path = new ArrayList<>();
+    public ArrayList<Point> openNodes = new ArrayList<>();
 
     private boolean mouseOnScreen = false;
 
@@ -150,8 +150,8 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         }
 
         //create the grid
-        for (int y = 0; y < Frame.height; y+=gridSide) {
-            for (int x = 0; x < Frame.width; x+=gridSide) {
+        for (int y = 0; y < height; y+=gridSide) {
+            for (int x = 0; x < width; x+=gridSide) {
                 if (y == sPoint.y*20 && x == sPoint.x*20) {
                     g.setColor(Color.RED);
                     g.fillRect(x, y, 20, 20);
@@ -219,7 +219,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
     }
 
-    static public Node<Point> nodeAtPoint(Point p) {
+    public Node<Point> nodeAtPoint(Point p) {
         return grid.get(p.y).get(p.x);
     }
 
@@ -267,13 +267,13 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == solve) {
-            bf = new BreadthFirstSearch(grid, sPoint, ePoint);
+            bf = new BreadthFirstSearch(grid, sPoint, ePoint, this);
             solve(bf);
             return;
         }
 
         if (e.getSource() == directedFirst) {
-            dbf = new DirectedBreadthFirst(grid, sPoint, ePoint);
+            dbf = new DirectedBreadthFirst(grid, sPoint, ePoint, this);
             solve(dbf);
             return;
         }
@@ -313,7 +313,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         if (e.getSource() == createMaze) {
             clear();
-            mazeGen = new MazeGenerator(sPoint, ePoint, grid);
+            mazeGen = new MazeGenerator(sPoint, ePoint, grid, this);
             walls = mazeGen.recursiveDivision();
             repaint();
         }
@@ -387,21 +387,21 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     void createGrid() {
         grid.clear();
 
-        for (int y = 0; y <= Frame.height; y+=gridSide) {
+        for (int y = 0; y <= height; y+=gridSide) {
             ArrayList<Node<Point>> row = new ArrayList<>();
-            for (int x = 0; x < Frame.width; x+=gridSide) {
+            for (int x = 0; x < width; x+=gridSide) {
 
                 if (y == sPoint.y*20 && x == sPoint.x*20) { 
                     Point p = new Point(x/20, x/20); //start
-                    Node<Point> n = new Node<>(null, p);
+                    Node<Point> n = new Node<>(null, p, this);
                     row.add(n); 
                 } else if (y == ePoint.y*20 && x == ePoint.x*20) {
                     Point p = new Point(x/20, x/20); //end
-                    Node<Point> n = new Node<>(null, p);
+                    Node<Point> n = new Node<>(null, p, this);
                     row.add(n);
                 } else {
                     Point p = new Point(x/20, y/20);
-                    Node<Point> n = new Node<>(null, p);
+                    Node<Point> n = new Node<>(null, p, this);
                     row.add(n);
                 }
 
@@ -411,13 +411,16 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         // System.out.println(grid.get(0).size());
     }
 
-    public static Point getSPoint() {
+    public Point getSPoint() {
         return sPoint;
     }
     
-    public static Point getEPoint() {
+    public Point getEPoint() {
         return ePoint;
     }
+
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
 
     @Override
     public void keyPressed(KeyEvent e) {

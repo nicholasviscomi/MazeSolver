@@ -1,6 +1,7 @@
 package Algorithms;
 
 import DataStructures.*;
+import GUI.Frame;
 import Helper.Helper;
 
 import java.util.ArrayList;
@@ -12,14 +13,16 @@ public class BreadthFirstSearch implements Algorithm {
     private final Point sPoint;
     private final Point ePoint;
 
-    private final Queue<Point> q = new Queue<>();
+    private final Queue<Point> q;
     private final ArrayList<ArrayList<Boolean>> visited = new ArrayList<>();
+    private final GUI.Frame frame;
 
-    public BreadthFirstSearch(ArrayList<ArrayList<Node<Point>>> grid, Point sPoint, Point ePoint) {
+    public BreadthFirstSearch(ArrayList<ArrayList<Node<Point>>> grid, Point sPoint, Point ePoint, GUI.Frame frame) {
         this.grid = grid;
         this.sPoint = sPoint;
         this.ePoint = ePoint;
-
+        this.frame = frame;
+        q = new Queue<>(this.frame);
         setVisited();
     }
 
@@ -33,11 +36,11 @@ public class BreadthFirstSearch implements Algorithm {
 
         while (q.size > 0) {
             Point next = q.dequeue();
-            Node<Point> nNode = GUI.Frame.nodeAtPoint(next);
+            Node<Point> nNode = frame.nodeAtPoint(next);
 
             if (Helper.pEqualsP(next, ePoint)) { //next point is the end point
-                System.out.println("Open Nodes: " + GUI.Frame.openNodes.size());
-                System.out.println("Path: " + getPath(GUI.Frame.nodeAtPoint(ePoint)).size());
+                System.out.println("Open Nodes: " + frame.openNodes.size());
+                System.out.println("Path: " + getPath(frame.nodeAtPoint(ePoint)).size());
                 foundPath = true;
                 break;
             }
@@ -58,23 +61,23 @@ public class BreadthFirstSearch implements Algorithm {
             int newX = n.value.x + dx[i];
             int newY = n.value.y + dy[i];
             Point newPoint = new Point(newX, newY);
-            Node<Point> newNode = new Node<Point>(n, newPoint);
-            if (
-                    !(newNode.value.y == GUI.Frame.height/20 ||
+            Node<Point> newNode = new Node<Point>(n, newPoint,frame); //makes new node that points back to previous one
+            if ( //if new val is NOT out of frame
+                    !(newNode.value.y == frame.getHeight()/20 ||
                             newNode.value.y == -1 ||
-                            newNode.value.x == GUI.Frame.width/20 ||
+                            newNode.value.x == frame.getWidth()/20 ||
                             newNode.value.x == -1)
             ) {
                 // System.out.println("ERROR IS HERE: x: " + newNode.value.x + "y: " + newNode.value.y);
                 // System.out.println("visited size: " + visited.size() + ", " + visited.get(0).size());
                 boolean isVisited = visited.get(newNode.value.y).get(newNode.value.x);
-                boolean isWall = GUI.Frame.walls.contains(newPoint);
+                boolean isWall = frame.walls.contains(newPoint);
 
                 if(!isVisited && !isWall) {
                     grid.get(newNode.value.y).set(newNode.value.x, newNode);
                     visited.get(newNode.value.y).set(newNode.value.x, true);
                     queue.enqueue(newPoint);
-                    GUI.Frame.openNodes.add(newPoint);
+                    frame.openNodes.add(newPoint);
                 }
             }
 
@@ -95,9 +98,9 @@ public class BreadthFirstSearch implements Algorithm {
         return path;
     }
     void setVisited() {
-        for (int i = 0; i < GUI.Frame.height/20; i++) {
+        for (int i = 0; i < frame.getHeight()/20; i++) {
             ArrayList<Boolean> row = new ArrayList<Boolean>();
-            for (int j = 0; j < GUI.Frame.width/20; j++) {
+            for (int j = 0; j < frame.getWidth()/20; j++) {
                 row.add(false);
             }
             visited.add(row);

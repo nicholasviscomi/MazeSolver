@@ -5,13 +5,15 @@ public class Queue<T> {
     public Node<T> tail, head;
     public int size = 0;
 
-    public Queue() {
+    private final GUI.Frame frame;
+    public Queue(GUI.Frame frame) {
         tail = null;
         head = null;
+        this.frame = frame;
     }
 
     public void enqueue(T val) {
-        Node<T> newNode = new Node<T>(null, val);
+        Node<T> newNode = new Node<>(null, val, frame);
 
         if (head == null) {
             head = newNode;

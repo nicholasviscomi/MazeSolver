@@ -2,6 +2,7 @@ package Algorithms;
 
 import DataStructures.Node;
 import DataStructures.PQueue;
+import Helper.Helper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class DirectedBreadthFirst implements Algorithm {
     queue to be in increasing size of distance to end node
     */
 
+    private final GUI.Frame frame;
     private final ArrayList<ArrayList<Node<Point>>> grid;
     public Point sPoint;
     public Point ePoint;
@@ -30,10 +32,11 @@ public class DirectedBreadthFirst implements Algorithm {
     // int[] vdy = {1, 1, -1, -1};
     // int[] vdx = {1, -1, 1, -1};
 
-    public DirectedBreadthFirst(ArrayList<ArrayList<Node<Point>>> grid, Point sPoint, Point ePoint) {
+    public DirectedBreadthFirst(ArrayList<ArrayList<Node<Point>>> grid, Point sPoint, Point ePoint, GUI.Frame frame) {
         this.grid = grid;
         this.sPoint = sPoint;
         this.ePoint = ePoint;
+        this.frame = frame;
         setVisited();
     }
 
@@ -44,8 +47,9 @@ public class DirectedBreadthFirst implements Algorithm {
         pq.clear();
 
         // pq.enqueue(Frame.sPoint, distFromEnd(Frame.sPoint));
-        System.out.println("spoint getter: " + GUI.Frame.getSPoint());
-        pq.enqueue(GUI.Frame.getSPoint(), distFromEnd(GUI.Frame.getSPoint()));
+        System.out.println("spoint getter: " + frame.getSPoint());
+        System.out.println("epoint getter: " + frame.getEPoint());
+        pq.enqueue(frame.getSPoint(), distFromEnd(frame.getSPoint()));
 
         while (pq.size > 0 && !found) {
             Point next = pq.dequeue();
@@ -54,9 +58,9 @@ public class DirectedBreadthFirst implements Algorithm {
                 System.out.println("dbf next point: " + next);
             }
             
-            Node<Point> nNode = GUI.Frame.nodeAtPoint(next);
+            Node<Point> nNode = frame.nodeAtPoint(next);
 
-            if (Helper.Helper.pEqualsP(next, ePoint)) {
+            if (Helper.pEqualsP(nNode.value, ePoint)) {
 //                System.out.println("Open Nodes: " + Frame.openNodes.size());
 //                System.out.println("Path: " + getPath(Frame.nodeAtPoint(ePoint)).size());
                 found = true;
@@ -81,24 +85,25 @@ public class DirectedBreadthFirst implements Algorithm {
             int newX = n.value.x + dx[i];
             int newY = n.value.y + dy[i];
             Point newPoint = new Point(newX, newY);
-            Node<Point> newNode = new Node<Point>(n, newPoint);
+            Node<Point> newNode = new Node<Point>(n, newPoint, frame);
 
             if (
-                    !(newNode.value.y == GUI.Frame.height/20 ||
-                newNode.value.y == -1 || 
-                newNode.value.x == GUI.Frame.width/20 ||
+                    !(newNode.value.y == frame.getHeight()/20 ||
+                newNode.value.y == -1 ||
+                newNode.value.x == frame.getWidth()/20 ||
                 newNode.value.x == -1)
             ) {
                 boolean isVisited = visited.get(newNode.value.y).get(newNode.value.x);
-                boolean isWall = GUI.Frame.walls.contains(newPoint);
+                boolean isWall = frame.walls.contains(newPoint);
 
                 if(!isVisited && !isWall) {
-                    grid.get(newNode.value.y).set(newNode.value.x, newNode);
+//                    Helper.printGrid(grid);
+                    grid.get(newNode.value.y).set(newNode.value.x, newNode); //ERROR HERE
                     visited.get(newNode.value.y).set(newNode.value.x, true);
 
                     pq.enqueue(newPoint, distFromEnd(newPoint));
                     // System.out.println("Dist: " + distFromEnd(newPoint) + " point: " + newPoint);
-                    GUI.Frame.openNodes.add(newPoint);
+                    frame.openNodes.add(newPoint);
                 }
             }
         }
@@ -120,9 +125,9 @@ public class DirectedBreadthFirst implements Algorithm {
         return path;
     }
 
-    public static double distFromEnd(Point p) {
-        double dy = Math.abs(p.y - GUI.Frame.ePoint.y);
-        double dx = Math.abs(p.x - GUI.Frame.ePoint.x);
+    public double distFromEnd(Point p) {
+        double dy = Math.abs(p.y - frame.getEPoint().y);
+        double dx = Math.abs(p.x - frame.getEPoint().x);
         // dx = Math.pow(dx, 2);
         // dy = Math.pow(dy, 2);
 
@@ -131,9 +136,9 @@ public class DirectedBreadthFirst implements Algorithm {
     }
 
     void setVisited() {
-        for (int i = 0; i < GUI.Frame.height/20; i++) {
+        for (int i = 0; i < frame.getWidth()/20; i++) {
             ArrayList<Boolean> row = new ArrayList<Boolean>();
-            for (int j = 0; j < GUI.Frame.width/20; j++) {
+            for (int j = 0; j < frame.getWidth()/20; j++) {
                 row.add(false);
             }
             visited.add(row);

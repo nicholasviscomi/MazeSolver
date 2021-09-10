@@ -8,7 +8,7 @@ import java.awt.*;
 
 
 public class Helper {
-    static void printGrid(ArrayList<ArrayList<Node<Point>>> grid) {
+    public static void printGrid(ArrayList<ArrayList<Node<Point>>> grid) {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 30; j++) {
                 System.out.print("(" + grid.get(i).get(j).value.x + "," + grid.get(i).get(j).value.y + ")");
@@ -39,11 +39,11 @@ public class Helper {
         arr[x] = temp;
     }
 
-    public static Point[] bubbleSort(Point[] arr) {
+    public static Point[] bubbleSort(Point[] arr, DirectedBreadthFirst dbf) {
         for (int step = 0; step < arr.length - 2; step++) {
             for (int i = 0; i < arr.length - 1; i++) {
-                double d1 = DirectedBreadthFirst.distFromEnd(arr[i]);
-                double d2 = DirectedBreadthFirst.distFromEnd(arr[i + 1]);
+                double d1 = dbf.distFromEnd(arr[i]);
+                double d2 = dbf.distFromEnd(arr[i + 1]);
                 if (d1 > d2) {
                     swap(arr, i, i + 1);
                 }
