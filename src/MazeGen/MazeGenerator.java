@@ -3,7 +3,6 @@ package MazeGen;
 import DataStructures.Node;
 import DataStructures.Queue;
 import Helper.Helper;
-import GUI.Frame;
 
 import java.util.ArrayList;
 import java.awt.*;
@@ -39,47 +38,47 @@ public class MazeGenerator {
      */
 
     public ArrayList<Point> recursive_division() {
-        Section seed = new Section(new Dimension(frame.getWidth(), frame.getHeight()), new Point(0, 0), false);
+        System.out.println("\n\nCreate maze!");
+        // width needs to be the number of boxes, NOT the number of pixels
+        Section seed = new Section(new Dimension(frame.getWidth()/20, frame.getHeight()/20), new Point(0, 0), false);
         queue.enqueue(seed);
 
-        while (queue.size > 0 && queue.size < 4) {
+        while (queue.size > 0) {
             Section s = queue.dequeue();
-            Section[] subs = divide(s.horiz, s.dimension, s.startPoint);
-            if (isLargeEnough(subs[0]) && isLargeEnough(subs[1])) {
-                queue.enqueue(subs[0]);
-                queue.enqueue(subs[1]);
+            Section[] subs = divide(s.dimension, s.startPoint);
+            for (Section section: subs) {
+//                System.out.println("Entering subsection | width = " + section.dimension + ", start = " +  section.startPoint);
+                if (isLargeEnough(section)) {
+                    queue.enqueue(section);
+                }
             }
         }
 
-        System.out.println("Finished maze creation");
         return walls;
     }
 
-    Section[] divide(boolean horiz, Dimension d, Point sectionStart) {
+    // first get it working with just drawing vertical lines
+    Section[] divide(Dimension d, Point sectionStart) {
         Section[] res = new Section[2];
-        if (horiz) { //drawing horizontal line
-            int seed = Helper.randomNumber(sectionStart.y, sectionStart.y+(d.height/20)); //which y value the line will have
-            int hole = Helper.randomNumber(sectionStart.x, sectionStart.x+(d.width/20));
-            System.out.println("Seed: " + seed);
-            for (int i = sectionStart.x; i < sectionStart.x + d.width; i++) {
-                if (i != hole) {
-                    walls.add(new Point(i, seed));
-                }
+        int seed = Helper.randomNumber(sectionStart.x, sectionStart.x + d.width);
+        System.out.println("Wall at x = " + seed);
+        int hole = Helper.randomNumber(sectionStart.y, d.height);
+        System.out.println("Hole at (" + seed + ", " + hole + ")");
+
+        for (int i = sectionStart.y; i < sectionStart.y + d.height; i++) {
+            if (i != hole) {
+                walls.add(new Point(seed, i));
             }
-//            res[0] = new Section(new Dimension(d.width - seed.x, ), seed, false); // top subsection
-//            res[1] = new Section(new Dimension(), new Point(s.startPoint.x + ), false); //bottom subsection
-        } else { //drawing vertical line
-            int seed = Helper.randomNumber(sectionStart.x, sectionStart.x+(d.width/20)); //which x value the line will have
-            int hole = Helper.randomNumber(sectionStart.y, sectionStart.y+(d.height/20));
-            System.out.println("Seed: " + seed + "\nmax: " + sectionStart.x+(d.width/20) + "\nhole: " + hole);
-            for (int i = sectionStart.y; i < sectionStart.y + d.height; i++) {
-                if (i != hole) {
-                    walls.add(new Point(seed, i));
-                }
-            }
-            res[0] = new Section(new Dimension((hole) - 2, d.height), sectionStart, false); // left subsection
-            res[1] = new Section(new Dimension(d.width - (hole*20), d.height), new Point(sectionStart.x + ((hole) + 2), sectionStart.y), false); //right subsection
         }
+
+        // need to do (seed - sectionStart.x) so that we don't accidentally get a negative width when we shouldn't
+        // it is also just the correct calculation b/c we want to get the width to the right of the wall WITHIN THE CURRENT SECTION
+        res[0] = new Section(new Dimension(d.width - (seed - sectionStart.x) - 2, d.height), new Point(seed + 2, sectionStart.y), false); // right subsection
+        System.out.println("Right subsection width = " + res[0].dimension + ", start = " +  res[0].startPoint);
+
+
+        res[1] = new Section(new Dimension((seed - sectionStart.x) - 2, d.height), new Point(sectionStart.x, sectionStart.y), false); // left subsection
+        System.out.println("Left subsection width = " + res[1].dimension + ", start = " +  res[1].startPoint);
 
         return res;
     }
@@ -101,7 +100,7 @@ public class MazeGenerator {
         return walls;
     }
 
-    private void setVisited() {
+    private void setAllUnVisited() {
         for (int i = 0; i < frame.getHeight()/20; i++) {
             ArrayList<Boolean> row = new ArrayList<>();
             for (int j = 0; j < frame.getWidth()/20; j++) {
