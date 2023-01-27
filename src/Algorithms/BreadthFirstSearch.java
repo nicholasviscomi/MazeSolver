@@ -32,7 +32,6 @@ public class BreadthFirstSearch implements Algorithm {
         q.clear();
         q.enqueue(sPoint);
 
-        System.out.println("spoint: " + sPoint);
 
         while (q.size > 0) {
             Point next = q.dequeue();
@@ -40,7 +39,7 @@ public class BreadthFirstSearch implements Algorithm {
 
             if (Helper.pEqualsP(next, ePoint)) { //next point is the end point
                 System.out.println("Open Nodes: " + frame.openNodes.size());
-                System.out.println("Path: " + getPath(frame.nodeAtPoint(ePoint)).size());
+                System.out.println("Breadth First Path: " + getPath(frame.nodeAtPoint(ePoint)).size());
                 foundPath = true;
                 break;
             }

@@ -1,6 +1,6 @@
 package Helper;
 
-import Algorithms.DirectedBreadthFirst;
+import Algorithms.BestFirstSearch;
 import DataStructures.*;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class Helper {
         arr[x] = temp;
     }
 
-    public static Point[] bubbleSort(Point[] arr, DirectedBreadthFirst dbf) {
+    public static Point[] bubbleSort(Point[] arr, BestFirstSearch dbf) {
         for (int step = 0; step < arr.length - 2; step++) {
             for (int i = 0; i < arr.length - 1; i++) {
                 double d1 = dbf.distFromEnd(arr[i]);

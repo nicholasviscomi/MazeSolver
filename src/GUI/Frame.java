@@ -4,7 +4,7 @@ import Algorithms.AStar;
 import Algorithms.Algorithm;
 import DataStructures.Node;
 import Algorithms.BreadthFirstSearch;
-import Algorithms.DirectedBreadthFirst;
+import Algorithms.BestFirstSearch;
 import Helper.Helper;
 import MazeGen.MazeGenerator;
 
@@ -42,12 +42,12 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
     private boolean mouseOnScreen = false;
 
-    private final JButton solve, clear, createMaze, directedFirst, aStarSolve;
+    private final JButton solve, clear, createMaze, bestFirst, aStarSolve;
     // private JCheckBox diagonalCB;
 
     //ALGORITHM CLASSES
     private BreadthFirstSearch bf;
-    private DirectedBreadthFirst dbf;
+    private BestFirstSearch bfs;
     private AStar aStar;
     MazeGenerator mazeGen;
 
@@ -62,12 +62,6 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     public static void main(String[] args) {
         new Frame();
     }
-
-    /*
-    IDEAS:
-        --> make a dot maze that is just dots all around the screen
-        --> different algorithms (bidirectional swarm is so dope)
-    */
 
     public Frame() {
         setLayout(null);
@@ -85,7 +79,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         frame.getContentPane().setPreferredSize(new Dimension(width, height));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
-        frame.setTitle("Magical Pathfinder");
+        frame.setTitle("Maze Solver");
         frame.setSize(width, height);
         frame.pack();
         frame.setLocationRelativeTo(null);
@@ -111,16 +105,16 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         createMaze.setVisible(true);
         createMaze.addActionListener(this);
 
-        directedFirst = new JButton("Directed Breadth First");
-        Dimension dbfSize = directedFirst.getPreferredSize();
-        directedFirst.setBounds(30 + clearSize.width, 530 + solveSize.height, dbfSize.width, dbfSize.height);
-        directedFirst.setOpaque(true);
-        directedFirst.setVisible(true);
-        directedFirst.addActionListener(this);
+        bestFirst = new JButton("Best First First");
+        Dimension bfsSize = bestFirst.getPreferredSize();
+        bestFirst.setBounds(30 + clearSize.width, 530 + solveSize.height, bfsSize.width, bfsSize.height);
+        bestFirst.setOpaque(true);
+        bestFirst.setVisible(true);
+        bestFirst.addActionListener(this);
 
         aStarSolve = new JButton("A*");
         Dimension aSize = aStarSolve.getPreferredSize();
-        aStarSolve.setBounds(directedFirst.getX() + dbfSize.width + 5, directedFirst.getY(), aSize.width, aSize.height);
+        aStarSolve.setBounds(bestFirst.getX() + bfsSize.width + 5, bestFirst.getY(), aSize.width, aSize.height);
         aStarSolve.setOpaque(true);
         aStarSolve.setVisible(true);
         aStarSolve.addActionListener(this);
@@ -128,9 +122,8 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         frame.add(solve);
         frame.add(clear);
         frame.add(createMaze);
-        frame.add(directedFirst);
-        frame.add(aStarSolve);
-        // frame.add(bidirectional);
+        frame.add(bestFirst);
+//        frame.add(aStarSolve);
 
         frame.setVisible(true);
         
@@ -145,7 +138,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         //draw the walls on
         for (Point point : walls) {
-            g.setColor(Color.BLUE);
+            g.setColor(Color.BLACK);
             g.fillRect(point.x * 20, point.y * 20, gridSide, gridSide);
         }
 
@@ -153,7 +146,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         for (int y = 0; y < height; y+=gridSide) {
             for (int x = 0; x < width; x+=gridSide) {
                 if (y == sPoint.y*20 && x == sPoint.x*20) {
-                    g.setColor(Color.RED);
+                    g.setColor(Color.ORANGE);
                     g.fillRect(x, y, 20, 20);
                 } else if (y == ePoint.y*20 && x == ePoint.x*20) {
                     g.setColor(Color.GREEN);
@@ -195,7 +188,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         if (nodesAreDrawn) {
             for (Point n : openNodes) {
-                g.setColor(new Color(255, 0, 0, 30));
+                g.setColor(new Color(255, 165, 0, 45));
                 g.fillRect(n.x*20, n.y*20, 20, 20);
             }
         }
@@ -205,7 +198,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
                 for (int i = 0; i <= oNodeIndex; i++) {
                     // System.out.print("open node: "); Helper.printPoint(n);
                     Point n = openNodes.get(i);
-                    g.setColor(new Color(255, 0, 0, 30));
+                    g.setColor(new Color(255, 165, 0, 45));
                     g.fillRect(n.x*20, n.y*20, 20, 20);
                 }
                 if (oNodeIndex == openNodes.size()-1) {
@@ -233,7 +226,6 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         if (alg.solve()) {
             path.clear();
-            System.out.println("path bf " + path);
             path = alg.getPath(nodeAtPoint(ePoint));
             path = Helper.reverse(path);
             pathTimer.start();
@@ -268,13 +260,15 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == solve) {
             bf = new BreadthFirstSearch(grid, sPoint, ePoint, this);
+            oNodeTimer.setDelay(2);
             solve(bf);
             return;
         }
 
-        if (e.getSource() == directedFirst) {
-            dbf = new DirectedBreadthFirst(grid, sPoint, ePoint, this);
-            solve(dbf);
+        if (e.getSource() == bestFirst) {
+            bfs = new BestFirstSearch(grid, sPoint, ePoint, this);
+            oNodeTimer.setDelay(7);
+            solve(bfs);
             return;
         }
 
@@ -314,7 +308,8 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         if (e.getSource() == createMaze) {
             clear();
             mazeGen = new MazeGenerator(sPoint, ePoint, grid, this);
-            walls = mazeGen.recursiveDivision();
+            walls.clear();
+            walls = mazeGen.recursive_division();
             repaint();
         }
          

@@ -1,6 +1,7 @@
 package DataStructures;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class PQueue {
     /*
@@ -14,91 +15,48 @@ public class PQueue {
 
     public PNode head, tail;
     public int size = 0;
+    public ArrayList<PNode> data;
 
     public PQueue() {
-        head = null;
-        tail = null;
+        data = new ArrayList<>();
     }
 
     public void enqueue(Point p, double dist) {
-        PNode d = new PNode(dist, null, p);
-        
-        if (head == null) {
-            head = d;
-            size++;
-        }
-
-        if (tail != null) {
-            tail.next = d;
-            size++;
-        }
-
-        tail = d;
-
-        sort();
-
-        return;
-    }
-
-    void sort() {
-
-        if (head == null) {
-            return;
-        }
-
-        PNode curr = head;
-
-        while (curr.next != null) {
-            if (curr.dist > curr.next.dist) {
-                Point tp = curr.p;
-                double td = curr.dist;
-
-                curr.p = curr.next.p;
-                curr.dist = curr.next.dist;
-
-                curr.next.p = tp;
-                curr.next.dist = td;
+        int i = 0;
+        while (i < data.size()) {
+            if (dist > data.get(i).dist) {
+                i++;
+            } else {
+                data.add(i, new PNode(dist, null, p));
+                break;
             }
-            curr = curr.next;
         }
-
-        return;
+        if (i == data.size()) {
+            data.add(i, new PNode(dist, null, p));
+        }
+        size++;
     }
 
     public Point dequeue() {
-        if (head == null) { return null; }
-
-        PNode tmp = head;
-        head = head.next;
-
-        if (head == null) { tail = null; }
-
-        size--;
-
-        return tmp.p;
+        if (size > 0) {
+            PNode tmp = data.get(0);
+            data.remove(0);
+            size--;
+            return tmp.p;
+        } else {
+            return null;
+        }
     }
 
     public void clear() {
+        data.clear();
         size = 0;
-        head = null;
-        tail = null;
     }
 
     public void print() {
-        if (head == null) {
-            return;
+        for (PNode p : data) {
+            System.out.print(p.dist + "-->");
         }
-
-        PNode curr = head;
-        System.out.print(curr.dist);
-
-        while (curr.next != null) {
-            curr = curr.next;
-            System.out.print("-->" + curr.dist);
-        }
-
-        System.out.println();
-        return;
     }
 
 }
