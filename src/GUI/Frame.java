@@ -9,6 +9,8 @@ import Helper.Helper;
 import MazeGen.MazeGenerator;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ eventually try and carry that creation over to this project
 
 */
 @SuppressWarnings("ALL")
-public class Frame extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener {
+public class Frame extends JPanel implements MouseListener, MouseMotionListener, ActionListener, KeyListener, ChangeListener {
     private static final long serialVersionUID = 1L;
     public int width = 1200;
     public int height = 600;
@@ -43,6 +45,8 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     private boolean mouseOnScreen = false;
 
     private final JButton solve, clear, createMaze, bestFirst, aStarSolve;
+
+    private final JSpinner maze_depth;
     // private JCheckBox diagonalCB;
 
     //ALGORITHM CLASSES
@@ -119,10 +123,21 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         aStarSolve.setVisible(true);
         aStarSolve.addActionListener(this);
 
+        SpinnerModel model = new SpinnerNumberModel(0, 0, 20, 1);
+        maze_depth = new JSpinner(model);
+        Dimension d = maze_depth.getPreferredSize();
+        maze_depth.setBounds(
+                createMaze.getX() + createMazeSize.width + 10, createMaze.getY(),
+                d.width, d.height
+        );
+        maze_depth.addChangeListener(this);
+        maze_depth.setVisible(true);
+
         frame.add(solve);
         frame.add(clear);
         frame.add(createMaze);
         frame.add(bestFirst);
+        frame.add(maze_depth);
 //        frame.add(aStarSolve);
 
         frame.setVisible(true);
@@ -138,6 +153,10 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         //draw the walls on
         for (Point point : walls) {
+            if ((point.y == sPoint.y*20 && point.x == sPoint.x*20) || (point.y == ePoint.y*20 && point.x == ePoint.x*20)) {
+                walls.remove(point);
+                continue;
+            }
             g.setColor(Color.BLACK);
             g.fillRect(point.x * 20, point.y * 20, gridSide, gridSide);
         }
@@ -309,7 +328,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
             clear();
             mazeGen = new MazeGenerator(sPoint, ePoint, grid, this);
             walls.clear();
-            walls = mazeGen.recursive_division();
+            walls = mazeGen.recursive_division((Integer) maze_depth.getValue());
             repaint();
         }
          
@@ -440,4 +459,14 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 	public void mouseMoved(MouseEvent e) {}
 
 
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        if (e.getSource() == maze_depth) {
+            clear();
+            mazeGen = new MazeGenerator(sPoint, ePoint, grid, this);
+            walls.clear();
+            walls = mazeGen.recursive_division((Integer) maze_depth.getValue());
+            repaint();
+        }
+    }
 }

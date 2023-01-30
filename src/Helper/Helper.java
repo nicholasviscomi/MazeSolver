@@ -5,6 +5,7 @@ import DataStructures.*;
 
 import java.util.ArrayList;
 import java.awt.*;
+import java.util.Random;
 
 
 public class Helper {
@@ -53,6 +54,7 @@ public class Helper {
     }
 
     public static int randomNumber(int min, int max) {
-        return (int) ((Math.random() * (max - min)) + min);
+        Random rand = new Random();
+        return rand.nextInt((max - min) + 1) + min;
     }
 }
