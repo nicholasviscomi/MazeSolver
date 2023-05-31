@@ -6,6 +6,7 @@ import Helper.Helper;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class BestFirstSearch implements Algorithm {
@@ -53,7 +54,9 @@ public class BestFirstSearch implements Algorithm {
         while (pq.size > 0 && !found) {
             Point next = pq.dequeue();
             frame.openNodes.add(next);
-            
+
+            System.out.println("next = " + next);
+
             Node<Point> newNode = frame.nodeAtPoint(next);
 
             if (Helper.pEqualsP(newNode.value, ePoint)) {
@@ -65,6 +68,7 @@ public class BestFirstSearch implements Algorithm {
 
             exploreNeighbors(newNode);
 
+//            new Scanner(System.in).nextLine();
         }
 
         return found;
@@ -86,9 +90,9 @@ public class BestFirstSearch implements Algorithm {
             Node<Point> newNode = new Node<>(n, newPoint, frame);
 
             if (
-                    !(newNode.value.y == frame.getHeight()/20 ||
+                    !(newNode.value.y == frame.getHeight()/frame.gridSide ||
                 newNode.value.y == -1 ||
-                newNode.value.x == frame.getWidth()/20 ||
+                newNode.value.x == frame.getWidth()/frame.gridSide ||
                 newNode.value.x == -1)
             ) {
                 boolean isVisited = visited.get(newNode.value.y).get(newNode.value.x);
@@ -132,9 +136,9 @@ public class BestFirstSearch implements Algorithm {
     }
 
     void setVisited() {
-        for (int i = 0; i < frame.getWidth()/20; i++) {
+        for (int i = 0; i < frame.getWidth()/frame.gridSide; i++) {
             ArrayList<Boolean> row = new ArrayList<Boolean>();
-            for (int j = 0; j < frame.getWidth()/20; j++) {
+            for (int j = 0; j < frame.getWidth()/frame.gridSide; j++) {
                 row.add(false);
             }
             visited.add(row);

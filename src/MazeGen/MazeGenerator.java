@@ -46,11 +46,12 @@ public class MazeGenerator {
     public ArrayList<Point> recursive_division(int depth) {
         System.out.println("\n\nCreate maze!");
         // width needs to be the number of boxes, NOT the number of pixels
-        Section seed = new Section(new Dimension(frame.getWidth()/20 - 1, frame.getHeight()/20 - 1), new Point(0, 0), false, -1);
+        Section seed = new Section(new Dimension(frame.getWidth()/20, frame.getHeight()/20), new Point(0, 0), false, -1);
         queue.enqueue(seed);
 
         int i = 0;
         while (queue.size > 0) {
+            if (i++ >= depth) { break; }
             Section s = queue.dequeue();
             Section[] subs = divide(s);
             for (Section section : subs) {
@@ -83,7 +84,7 @@ public class MazeGenerator {
                 seed = Helper.randomNumber(sectionStart.x + 1, sectionStart.x + d.width - 1);
             }
             if (d.height == 3)
-                    seed = 2;
+                    seed = 1;
 
             System.out.println("Wall at x = " + seed + " Prev hole @ x = (" + prev_hole + ")");
 
@@ -106,7 +107,7 @@ public class MazeGenerator {
                             d.width - (seed - sectionStart.x),
                             d.height - 2 // minus 2 gives a padding of 1 on the top and the bottom (no stacked horizontal lines!)
                     ),
-                    new Point(seed + 1, sectionStart.y + 1),
+                    new Point(seed + 1, sectionStart.y),
                     true, hole
             ); // right subsection
             System.out.println("Right subsection = " + res[0].dimension + ", start = " + res[0].startPoint);
@@ -114,7 +115,7 @@ public class MazeGenerator {
 
             res[1] = new Section(
                     new Dimension(seed - sectionStart.x, d.height - 2),
-                    new Point(sectionStart.x, sectionStart.y + 1),
+                    new Point(sectionStart.x, sectionStart.y),
                     true, hole
             ); // left subsection
             System.out.println("Left subsection = " + res[1].dimension + ", start = " + res[1].startPoint);
@@ -128,7 +129,7 @@ public class MazeGenerator {
             }
 
             if (d.height == 3)
-                    seed = 2;
+                    seed = 1; // middle
 
             System.out.println("Wall at y = " + seed + " Prev hole @ y = " + prev_hole);
             int hole = Helper.randomNumber(sectionStart.x + 1, sectionStart.x + d.width - 1);

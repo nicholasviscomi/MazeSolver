@@ -1,7 +1,7 @@
 package GUI;
 
-import Algorithms.AStar;
 import Algorithms.Algorithm;
+import Algorithms.FloodFill;
 import DataStructures.Node;
 import Algorithms.BreadthFirstSearch;
 import Algorithms.BestFirstSearch;
@@ -30,7 +30,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     private static final long serialVersionUID = 1L;
     public int width = 1200;
     public int height = 600;
-    static int gridSide = 20;
+    public int gridSide = 20;
     public Point sPoint;
     public Point ePoint;
 
@@ -44,18 +44,16 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
     private boolean mouseOnScreen = false;
 
-    private final JButton solve, clear, createMaze, bestFirst, aStarSolve;
+    private final JButton solve, clear, createMaze, bestFirst, floodFill;
 
     private final JSpinner maze_depth;
     // private JCheckBox diagonalCB;
 
     //ALGORITHM CLASSES
-    private BreadthFirstSearch bf;
-    private BestFirstSearch bfs;
-    private AStar aStar;
+    private BreadthFirstSearch breadthFirstSearch;
+    private BestFirstSearch bestFirstSearch;
+    private FloodFill floodFillSearch;
     MazeGenerator mazeGen;
-
-    // static char currKey;
 
     private boolean pathOnScreen = false;
     private boolean pathIsDrawn = false;
@@ -75,8 +73,10 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         addMouseMotionListener(this);
         addKeyListener(this);
 
-        sPoint = new Point(15, 15);
-        ePoint = new Point(53, 15);
+        sPoint = new Point((int) Math.floor(width/gridSide * 0.2),  (int) Math.floor(height/gridSide * 0.5));
+        System.out.println("sPoint = " + sPoint);
+        ePoint = new Point((int) Math.floor(width/gridSide * 0.8),  (int) Math.floor(height/gridSide * 0.5));
+        System.out.println("ePoint = " + ePoint);
 
         frame = new JFrame();
         frame.setContentPane(this);
@@ -109,21 +109,21 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         createMaze.setVisible(true);
         createMaze.addActionListener(this);
 
-        bestFirst = new JButton("Best First First");
+        bestFirst = new JButton("Best First Search");
         Dimension bfsSize = bestFirst.getPreferredSize();
         bestFirst.setBounds(30 + clearSize.width, 530 + solveSize.height, bfsSize.width, bfsSize.height);
         bestFirst.setOpaque(true);
         bestFirst.setVisible(true);
         bestFirst.addActionListener(this);
 
-        aStarSolve = new JButton("A*");
-        Dimension aSize = aStarSolve.getPreferredSize();
-        aStarSolve.setBounds(bestFirst.getX() + bfsSize.width + 5, bestFirst.getY(), aSize.width, aSize.height);
-        aStarSolve.setOpaque(true);
-        aStarSolve.setVisible(true);
-        aStarSolve.addActionListener(this);
+        floodFill = new JButton("Flood Fill Search");
+        Dimension aSize = floodFill.getPreferredSize();
+        floodFill.setBounds(bestFirst.getX() + bfsSize.width + 5, bestFirst.getY(), aSize.width, aSize.height);
+        floodFill.setOpaque(true);
+        floodFill.setVisible(true);
+        floodFill.addActionListener(this);
 
-        SpinnerModel model = new SpinnerNumberModel(0, 0, 20, 1);
+        SpinnerModel model = new SpinnerNumberModel(0, 0, gridSide, 1);
         maze_depth = new JSpinner(model);
         Dimension d = maze_depth.getPreferredSize();
         maze_depth.setBounds(
@@ -138,7 +138,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         frame.add(createMaze);
         frame.add(bestFirst);
         frame.add(maze_depth);
-//        frame.add(aStarSolve);
+        frame.add(floodFill);
 
         frame.setVisible(true);
         
@@ -153,38 +153,29 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
         //draw the walls on
         for (Point point : walls) {
-            if ((point.y == sPoint.y*20 && point.x == sPoint.x*20) || (point.y == ePoint.y*20 && point.x == ePoint.x*20)) {
+            if ((point.y == sPoint.y*gridSide && point.x == sPoint.x*gridSide) || (point.y == ePoint.y*gridSide && point.x == ePoint.x*gridSide)) {
                 walls.remove(point);
                 continue;
             }
             g.setColor(Color.BLACK);
-            g.fillRect(point.x * 20, point.y * 20, gridSide, gridSide);
+            g.fillRect(point.x * gridSide, point.y * gridSide, gridSide, gridSide);
         }
 
         //create the grid
         for (int y = 0; y < height; y+=gridSide) {
             for (int x = 0; x < width; x+=gridSide) {
-                if (y == sPoint.y*20 && x == sPoint.x*20) {
+                if (y == sPoint.y*gridSide && x == sPoint.x*gridSide) {
                     g.setColor(Color.ORANGE);
-                    g.fillRect(x, y, 20, 20);
-                } else if (y == ePoint.y*20 && x == ePoint.x*20) {
+                    g.fillRect(x, y, gridSide, gridSide);
+                } else if (y == ePoint.y*gridSide && x == ePoint.x*gridSide) {
                     g.setColor(Color.GREEN);
-                    g.fillRect(x, y, 20, 20);
+                    g.fillRect(x, y, gridSide, gridSide);
                 } else {
                     g.setColor(Color.BLACK);
                     g.drawRect(x, y, gridSide, gridSide);
                 }
             }
         }
-
-        //keep the path drawn after it was animated previously
-        // if (pathIsDrawm) {
-        //     for (Node<Point> n : path) {
-        //         System.out.println("paint spoint: " + path.get(0).value);
-        //         g.setColor(new Color(0, 0, 0, 80));
-        //         g.fillRect(n.value.x*20, n.value.y*20, 20, 20);
-        //     }
-        // }
 
         //animate drawing the path 
         if (path.size() > 0 && pathIndex < path.size() && !pathIsDrawn) {
@@ -193,10 +184,9 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
                     Node<Point> n = path.get(i);
                     // System.out.println("paint spoint: " + n.value);
                     g.setColor(new Color(0, 0, 0, 80));
-                    g.fillRect(n.value.x*20, n.value.y*20, 20, 20);
+                    g.fillRect(n.value.x*gridSide, n.value.y*gridSide, gridSide, gridSide);
                 }
                 if (pathIndex == path.size()-1) {
-                    System.out.println("stopping timer! ");
                     pathTimer.stop();
                     pathIsDrawn = true;
                     pathIndex = 0;
@@ -205,23 +195,24 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
             }
         } 
 
+        // drawing open nodes after they have been animated on
         if (nodesAreDrawn) {
             for (Point n : openNodes) {
                 g.setColor(new Color(255, 165, 0, 45));
-                g.fillRect(n.x*20, n.y*20, 20, 20);
+                g.fillRect(n.x*gridSide, n.y*gridSide, gridSide, gridSide);
             }
         }
 
+        // animate drawing open nodes
         if (openNodes.size() > 0 && oNodeIndex < openNodes.size() && !nodesAreDrawn) {
             if (oNodeTimer.isRunning()) {
                 for (int i = 0; i <= oNodeIndex; i++) {
                     // System.out.print("open node: "); Helper.printPoint(n);
                     Point n = openNodes.get(i);
                     g.setColor(new Color(255, 165, 0, 45));
-                    g.fillRect(n.x*20, n.y*20, 20, 20);
+                    g.fillRect(n.x*gridSide, n.y*gridSide, gridSide, gridSide);
                 }
                 if (oNodeIndex == openNodes.size()-1) {
-                    System.out.println("stopping oNode timer! ");
                     oNodeTimer.stop();
                     nodesAreDrawn = true;
                     oNodeIndex = 0;
@@ -246,7 +237,9 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         if (alg.solve()) {
             path.clear();
             path = alg.getPath(nodeAtPoint(ePoint));
-            path = Helper.reverse(path);
+            if (!alg.equals(floodFillSearch)) {
+                path = Helper.reverse(path);
+            }
             pathTimer.start();
             oNodeTimer.start();
         }
@@ -278,22 +271,24 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == solve) {
-            bf = new BreadthFirstSearch(grid, sPoint, ePoint, this);
+            breadthFirstSearch = new BreadthFirstSearch(grid, sPoint, ePoint, this);
             oNodeTimer.setDelay(2);
-            solve(bf);
+            solve(breadthFirstSearch);
             return;
         }
 
         if (e.getSource() == bestFirst) {
-            bfs = new BestFirstSearch(grid, sPoint, ePoint, this);
+            bestFirstSearch = new BestFirstSearch(grid, sPoint, ePoint, this);
             oNodeTimer.setDelay(7);
-            solve(bfs);
+            solve(bestFirstSearch);
             return;
         }
 
-        if (e.getSource() == aStarSolve) {
-            aStar = new AStar(grid, sPoint, ePoint);
-            solve(aStar);
+        if (e.getSource() == floodFill) {
+            floodFillSearch = new FloodFill(grid, sPoint, ePoint, this);
+            oNodeTimer.setDelay(7);
+            solve(floodFillSearch);
+            return;
         }
 
         if (e.getSource() == clear) {
@@ -404,21 +399,9 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         for (int y = 0; y <= height; y+=gridSide) {
             ArrayList<Node<Point>> row = new ArrayList<>();
             for (int x = 0; x < width; x+=gridSide) {
-
-                if (y == sPoint.y*20 && x == sPoint.x*20) { 
-                    Point p = new Point(x/20, x/20); //start
-                    Node<Point> n = new Node<>(null, p, this);
-                    row.add(n); 
-                } else if (y == ePoint.y*20 && x == ePoint.x*20) {
-                    Point p = new Point(x/20, x/20); //end
-                    Node<Point> n = new Node<>(null, p, this);
-                    row.add(n);
-                } else {
-                    Point p = new Point(x/20, y/20);
-                    Node<Point> n = new Node<>(null, p, this);
-                    row.add(n);
-                }
-
+                Point p = new Point(x/gridSide, y/gridSide);
+                Node<Point> n = new Node<>(null, p, this);
+                row.add(n);
             }
             grid.add(row);
         }

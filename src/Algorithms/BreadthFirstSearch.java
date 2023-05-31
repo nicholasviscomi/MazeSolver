@@ -31,7 +31,7 @@ public class BreadthFirstSearch implements Algorithm {
         setVisited();
         q.clear();
         q.enqueue(sPoint);
-
+        System.out.println("Breadth sPoint = " + sPoint);
 
         while (q.size > 0) {
             Point next = q.dequeue();
@@ -60,15 +60,15 @@ public class BreadthFirstSearch implements Algorithm {
             int newX = n.value.x + dx[i];
             int newY = n.value.y + dy[i];
             Point newPoint = new Point(newX, newY);
-            Node<Point> newNode = new Node<Point>(n, newPoint,frame); //makes new node that points back to previous one
+            Node<Point> newNode = new Node<>(n, newPoint, frame); //makes new node that points back to previous one
             if ( //if new val is NOT out of frame
-                    !(newNode.value.y == frame.getHeight()/20 ||
+                    !(
+                            newNode.value.y == frame.getHeight()/frame.gridSide ||
                             newNode.value.y == -1 ||
-                            newNode.value.x == frame.getWidth()/20 ||
-                            newNode.value.x == -1)
+                            newNode.value.x == frame.getWidth()/frame.gridSide ||
+                            newNode.value.x == -1
+                    )
             ) {
-                // System.out.println("ERROR IS HERE: x: " + newNode.value.x + "y: " + newNode.value.y);
-                // System.out.println("visited size: " + visited.size() + ", " + visited.get(0).size());
                 boolean isVisited = visited.get(newNode.value.y).get(newNode.value.x);
                 boolean isWall = frame.walls.contains(newPoint);
 
@@ -97,9 +97,9 @@ public class BreadthFirstSearch implements Algorithm {
         return path;
     }
     void setVisited() {
-        for (int i = 0; i < frame.getHeight()/20; i++) {
+        for (int i = 0; i < frame.getHeight()/ frame.gridSide; i++) {
             ArrayList<Boolean> row = new ArrayList<Boolean>();
-            for (int j = 0; j < frame.getWidth()/20; j++) {
+            for (int j = 0; j < frame.getWidth()/ frame.gridSide; j++) {
                 row.add(false);
             }
             visited.add(row);
