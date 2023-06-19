@@ -26,8 +26,8 @@ public class Helper {
         return (p1.x == p2.x && p1.y == p2.y);
     }
     
-    public static ArrayList<Node<Point>> reverse(ArrayList<Node<Point>> arr) {
-        ArrayList<Node<Point>> copy = new ArrayList<>();
+    public static <T> ArrayList<T> reverse(ArrayList<T> arr) {
+        ArrayList<T> copy = new ArrayList<>();
         for (int i = arr.size()-1; i > -1; i--) {
             copy.add(arr.get(i));
         }

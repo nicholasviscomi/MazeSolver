@@ -110,17 +110,17 @@ public class BestFirstSearch implements Algorithm {
 
     }
 
-    public ArrayList<Node<Point>> getPath(Node<Point> end) {
-        ArrayList<Node<Point>> path = new ArrayList<>();
+    public ArrayList<Point> getPath(Node<Point> end) {
+        ArrayList<Point> path = new ArrayList<>();
         Node<Point> curr = end;
 
         System.out.println("get path: " + sPoint);
         while (curr.next != null) {// maybe add an exception where it breaks the loop if it equals the spoint
-            path.add(curr);
+            path.add(curr.value);
             curr = curr.next;
         }   
 
-        path.add(curr);
+        path.add(curr.value);
 
         return path;
     }

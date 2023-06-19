@@ -94,12 +94,8 @@ public class FloodFill implements Algorithm {
             //      shortest point
             nextPoints.sort((p1, p2) -> getDistance(p1) - getDistance(p2));
 
-//            System.out.println(curr);
-//            System.out.println("Path: " + path);
-//            System.out.println("Next Points: " + nextPoints);
-//            System.out.println("-----------------------------");
+            //Now need to sub-sort this array by how close each point is to the current point
 
-//            new Scanner(System.in).nextLine();
         }
 
         return foundPath;
@@ -206,15 +202,74 @@ public class FloodFill implements Algorithm {
     }
 
     @Override
-    public ArrayList<Node<Point>> getPath(Node<Point> ePoint) {
-        ArrayList<Node<Point>> res = new ArrayList<>();
+    public ArrayList<Point> getPath(Node<Point> ePoint) {
+        ArrayList<Point> res = new ArrayList<>();
         System.out.println(path);
 
-        for (Point p : path) {
-            res.add(new Node<>(null, p, frame));
-        }
-
-        return res;
+//        dq.clear();
+//        for (ArrayList<Integer> row : distances) {
+//            System.out.println(row);
+//        }
+//        //Go through the distances matrix from the end point and choose the quickest path
+//        ArrayList<ArrayList<Boolean>> local_visited = new ArrayList<>();
+//
+//        // set local visited matrix
+//        for (int i = 0; i < frame.getHeight()/frame.gridSide; i++) {
+//            ArrayList<Boolean> row = new ArrayList<>();
+//            for (int j = 0; j < frame.getWidth()/frame.gridSide; j++) {
+//                row.add(false);
+//            }
+//            local_visited.add(row);
+//        }
+//        //-------------------------
+//
+//        dq.enqueue(sPoint);
+//
+//        distances.get(sPoint.y).set(sPoint.x, 0);
+//        local_visited.get(sPoint.y).set(sPoint.x, true); // critical line: ensures the end point is not revisited
+//
+//        while (dq.size > 0) {
+//            Point curr = dq.dequeue();
+//            res.add(curr);
+//
+//            ArrayList<Point> validPoints = new ArrayList<>();
+//
+//            // look up, down, left, right to find next point which is the shortest distance away
+//            int[] dy = {-1, 0, 1, 0}; //{-1, 1, 0, 0, -1, 1, -1, 1};
+//            int[] dx = {0, 1, 0, -1}; //{0, 0, 1, -1, 1, 1, -1, -1};
+//            for (int i = 0; i < 4; i++) {
+//                int newX = curr.x + dx[i];
+//                int newY = curr.y + dy[i];
+//
+//                if ( //if new val is out of frame
+//                        newY == frame.getHeight()/frame.gridSide ||
+//                                newY == -1 ||
+//                                newX == frame.getWidth()/frame.gridSide ||
+//                                newX == -1
+//                ) { continue; }
+//
+//                Point newP = new Point(newX, newY);
+//                boolean isVisited = local_visited.get(newY).get(newX);
+//                // using excluded here because flood fill only knows about the walls it encountered
+//                boolean isWall = excluded.contains(newP);
+//
+//                if (isVisited || isWall) { continue; }
+//
+//                local_visited.get(newY).set(newX, true);
+//                validPoints.add(newP);
+//
+//                if (Helper.pEqualsP(newP, ePoint.value)) {
+//                    res.add(newP);
+//                    return res;
+//                }
+//            }
+//            validPoints.sort((p1, p2) -> getDistance(p1) - getDistance(p2));
+//            if (validPoints.size() > 0) {
+//                System.out.println("validPoints.get(0) = " + validPoints.get(0));
+//                dq.enqueue(validPoints.get(0));
+//            }
+//        }
+        return path;
     }
 
     void setVisited() {

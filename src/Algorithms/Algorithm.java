@@ -7,5 +7,5 @@ import java.awt.Point;
 
 public interface Algorithm {
     public boolean solve();
-    public ArrayList<Node<Point>> getPath(Node<Point> ePoint);
+    public ArrayList<Point> getPath(Node<Point> ePoint);
 }

@@ -30,7 +30,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     private static final long serialVersionUID = 1L;
     public int width = 1200;
     public int height = 600;
-    public int gridSide = 20;
+    public int gridSide = 30;
     public Point sPoint;
     public Point ePoint;
 
@@ -39,7 +39,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
     public ArrayList<Point> walls = new ArrayList<>();
     public ArrayList<ArrayList<Node<Point>>> grid = new ArrayList<>();
-    public ArrayList<Node<Point>> path = new ArrayList<>();
+    public ArrayList<Point> path = new ArrayList<>();
     public ArrayList<Point> openNodes = new ArrayList<>();
 
     private boolean mouseOnScreen = false;
@@ -181,10 +181,10 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         if (path.size() > 0 && pathIndex < path.size() && !pathIsDrawn) {
             if (pathTimer.isRunning()) {
                 for (int i = 0; i <= pathIndex; i++) {
-                    Node<Point> n = path.get(i);
+                    Point n = path.get(i);
                     // System.out.println("paint spoint: " + n.value);
                     g.setColor(new Color(0, 0, 0, 80));
-                    g.fillRect(n.value.x*gridSide, n.value.y*gridSide, gridSide, gridSide);
+                    g.fillRect(n.x*gridSide, n.y*gridSide, gridSide, gridSide);
                 }
                 if (pathIndex == path.size()-1) {
                     pathTimer.stop();
