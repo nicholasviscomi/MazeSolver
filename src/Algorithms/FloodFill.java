@@ -7,6 +7,9 @@ import Helper.Helper;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class FloodFill implements Algorithm {
@@ -86,16 +89,37 @@ public class FloodFill implements Algorithm {
                 break;
             }
 
-            ArrayList<Point> validSquares = exploreNeighbors(curr);
-            nextPoints.addAll(validSquares);
+            nextPoints.addAll(exploreNeighbors(curr));
 
             // sort the nextPoints array according to the newly updated distances array
             // e.x. if a newly discovered wall changes the path, it will go back to the
             //      shortest point
-            nextPoints.sort((p1, p2) -> getDistance(p1) - getDistance(p2));
+            System.out.println("curr = " + curr);
+            System.out.println("Before" + nextPoints);
+            nextPoints.sort((p1, p2) ->
+                (getDistance(p1) + Math.abs(p1.y - curr.y)) - (getDistance(p2) + Math.abs(p2.y - curr.y))
+            );
+            System.out.println("After" + nextPoints + "\n");
 
-            //Now need to sub-sort this array by how close each point is to the current point
-
+            //            ArrayList<ArrayList<Point>> master = new ArrayList<>();
+//            //Now need to sub-sort this array by how close each point is to the current point
+//            Point prev = null;
+//            ArrayList<Point> entry = new ArrayList<>();
+//            for (Point p: nextPoints) {
+//                if (prev == null || getDistance(p) == getDistance(prev)) {
+//                    entry.add(p);
+//                } else if (getDistance(p) != getDistance(prev)) {
+//                    master.add(entry);
+//                    entry = new ArrayList<>();
+//                    entry.add(p);
+//                }
+//
+//                prev = p;
+//            }
+//
+//            for (int i = 0; i < master.size(); i++) {
+//                master.get(i).sort();
+//            }
         }
 
         return foundPath;
@@ -189,6 +213,10 @@ public class FloodFill implements Algorithm {
 
     private int getDistance(Point p){
         return distances.get(p.y).get(p.x);
+    }
+
+    private int manhattanDistance(Point a, Point b) {
+        return Math.abs(b.x - a.x) + Math.abs(b.y - b.x);
     }
 
     private void initDistances() {

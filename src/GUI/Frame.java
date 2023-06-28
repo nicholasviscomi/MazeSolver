@@ -30,7 +30,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     private static final long serialVersionUID = 1L;
     public int width = 1200;
     public int height = 600;
-    public int gridSide = 30;
+    public int gridSide = 60;
     public Point sPoint;
     public Point ePoint;
 
