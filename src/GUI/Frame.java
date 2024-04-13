@@ -30,7 +30,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
     private static final long serialVersionUID = 1L;
     public int width = 1200;
     public int height = 600;
-    public int gridSide = 60;
+    public int gridSide = 30;
     public Point sPoint;
     public Point ePoint;
 
@@ -177,7 +177,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
             }
         }
 
-        //animate drawing the path 
+        //animate drawing the path
         if (path.size() > 0 && pathIndex < path.size() && !pathIsDrawn) {
             if (pathTimer.isRunning()) {
                 for (int i = 0; i <= pathIndex; i++) {
@@ -191,9 +191,9 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
                     pathIsDrawn = true;
                     pathIndex = 0;
                 }
-            
+
             }
-        } 
+        }
 
         // drawing open nodes after they have been animated on
         if (nodesAreDrawn) {
@@ -228,7 +228,7 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
 
     void solve(Algorithm alg) {
         if (pathOnScreen) { return; }
-        
+
         createGrid();
 
         System.out.print("solve: ");
@@ -249,24 +249,28 @@ public class Frame extends JPanel implements MouseListener, MouseMotionListener,
         pathOnScreen = true;
     }
 
+    int pathIndex = 0;
+    int oNodeIndex = 0;
+
     void clear() {
         if (!pathOnScreen) {
             walls.clear();
         }
         path.clear();
-        openNodes.clear();
         pathOnScreen = false;
-        pathIsDrawn = false;
+
+        openNodes.clear();
         nodesAreDrawn = false;
+
+        pathIsDrawn = false;
+
         pathIndex = 0;
         oNodeIndex = 0;
+
         repaint();
         requestFocus();
         createGrid();
     }
-
-    int pathIndex = 0;
-    int oNodeIndex = 0;
 
     @Override
     public void actionPerformed(ActionEvent e) {

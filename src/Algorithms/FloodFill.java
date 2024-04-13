@@ -80,7 +80,6 @@ public class FloodFill implements Algorithm {
             path.add(curr);
             visited.get(curr.y).set(curr.x, true);
 
-            nextPoints.remove(0);
 
             if (Helper.pEqualsP(curr, ePoint)) { //next point is the end point
                 System.out.println("Hit end point");
@@ -90,6 +89,7 @@ public class FloodFill implements Algorithm {
             }
 
             nextPoints.addAll(exploreNeighbors(curr));
+            nextPoints.remove(0);
 
             // sort the nextPoints array according to the newly updated distances array
             // e.x. if a newly discovered wall changes the path, it will go back to the
